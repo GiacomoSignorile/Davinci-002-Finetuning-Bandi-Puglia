@@ -2,7 +2,7 @@
 
 ## davinci-002-Finetuning-Bandi-Puglia - Cartella Documenti
 
-Questa cartella contiene i documenti pdf scaricati dal sito www.sistema-puglia.it che contiene i bandi della Regione Puglia che utilizzeremo per creare il dataset per il Fine-Tuning
+Questa cartella contiene i documenti pdf scaricati dal sito https://www.sistema.puglia.it/ che contiene i bandi della Regione Puglia che utilizzeremo per creare il dataset per il Fine-Tuning
 
 
 ## davinci-002-Finetuning-Bandi-Puglia - Cartella Notebook
