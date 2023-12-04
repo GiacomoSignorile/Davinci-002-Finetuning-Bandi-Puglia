@@ -18,4 +18,4 @@ Questo progetto contiene alcuni notebook Jupyter¹ che mostrano come utilizzare 
 - **05_Confronto_Rag.ipynb**: questo notebook mostra come si crea una Retrieval Augmented Generation e mostra le differenze con il modello fine-tuned.
 - **Application.py**:  mostra come creare un'applicazione web con la libreria **streamlit** che permette di interagire con il modello finetunato e di fare domande sui bandi della Regione Puglia. L'applicazione mostra anche la fonte della risposta e il link al bando corrispondente.
 - **99_QA_with_filtering_Metadata_Label.ipynb**: In questo notebook ho svolto una RAG e ho trovato un modo per creare un metadato label che sia contenuto nel documento, e durante la QA sia possibile rispondere più precisamente filtrando il metadato label trovato anche sulla query.
-
+- **100_Dimensione_impresa_metadata_filtering_RAG** : In questo notebook analizzo solo come labellare il tipo di impresa a cui è rivolto il documento e fare una retrieval augmentation filtrata in base al tipo di impresa che si da in input.
