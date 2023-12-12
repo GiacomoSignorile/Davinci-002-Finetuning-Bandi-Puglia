@@ -52,7 +52,7 @@ class chatbt:
         docs = text_splitter.split_documents(pdf_text)
         embeddings = OpenAIEmbeddings()
         index = pinecone.Index("embedding-bandi")
-        embeddedvector = embeddings.embed_query(docs)
+        embeddedvector = embeddings.embed_query(docs.page_content)
         index.upsert(vectors=[embeddedvector])
         
         chatbt_instance.qa, chatbt_instance.vector_store = chatbt_instance.load_db("stuff", 4)
