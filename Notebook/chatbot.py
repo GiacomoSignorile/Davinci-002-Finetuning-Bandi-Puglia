@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Pinecone
+from langchain.vectorstores import Chroma,Pinecone
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import PyPDFLoader
@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import os
 import pinecone
 import tempfile
+import time
 
 load_dotenv('.env')
 
@@ -51,13 +52,12 @@ class chatbt:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
         docs = text_splitter.split_documents(pdf_text)
         embeddings = OpenAIEmbeddings()
-        index = pinecone.Index("embedding-bandi")
-        embeddedvector = embeddings.embed_query(docs.page_content)
-        index.upsert(vectors=[embeddedvector])
+        vector_store = Chroma.from_documents(docs, embeddings)
+
         
         chatbt_instance.qa, chatbt_instance.vector_store = chatbt_instance.load_db("stuff", 4)
 
-        return st.success("Documento PDF caricato con successo!")
+        return st.success("Documento PDF caricato con successo!"),vector_store
 
 # Streamlit code
 st.title('Chatbot Bandi in corso Regione Puglia')
@@ -68,19 +68,42 @@ if uploaded_file:
      chatbt_instance.load_pdf(uploaded_file)
 
 # messaggio di benvenuto
-message = st.chat_message("assistant")
+with st.chat_message('assistant'):
+     st.write("Ciao, sono il tuo assistente personlale personalizzato per rispondere a domande relative ai bandi in corso della regione Puglia!")
 
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-user_input = st.chat_input("Inserisci la tua domanda:")
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-if user_input:
-    message_input = st.chat_message("user")
-    message_input.write(user_input)
+if user_input := st.chat_input("Inserisci la tua domanda:"):
+    with st.chat_message("user"):
+        st.markdown(user_input)
+
     result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history})
     chatbt_instance.chat_history.append([(user_input, result["answer"])])
     chatbt_instance.qa, chatbt_instance.vector_store = chatbt_instance.load_db("stuff", 4)
-    chatbt_instance.answer = result['answer'] 
-    # Visualizza la risposta del chatbot all'interno della chat
-    
-    message.write(chatbt_instance.answer)
+    chatbt_instance.answer = result['answer']
+     
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": user_input})
+
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        assistant_response = chatbt_instance.answer
+        # Simulate stream of response with milliseconds delay
+        for chunk in assistant_response.split():
+            full_response += chunk + " "
+            time.sleep(0.05)
+            # Add a blinking cursor to simulate typing
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
 
