@@ -1,0 +1,8 @@
+python-dotenv
+langchain
+openai
+chromadb
+tiktoken
+streamlit
+pinecone-client
+pysqlite3-binary

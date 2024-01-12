@@ -10,6 +10,8 @@ import os
 import pinecone
 import tempfile
 import time
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 load_dotenv('.env')
 
@@ -54,8 +56,8 @@ class chatbt:
         embeddings = OpenAIEmbeddings()
         vector_store = Chroma.from_documents(docs, embeddings)
 
-        
-        chatbt_instance.qa, chatbt_instance.vector_store = chatbt_instance.load_db("stuff", 4)
+        chatbt_instance.vector_store = vector_store
+        chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
 
         return st.success("Documento PDF caricato con successo!"),vector_store
 
