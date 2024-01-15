@@ -6,3 +6,4 @@ tiktoken
 streamlit
 pinecone-client
 pysqlite3-binary
+pypdf

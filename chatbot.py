@@ -28,13 +28,16 @@ os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ["LANGCHAIN_API_KEY"] = "ls__0554eeed658141b4a601195abd6c737d"
 
 class chatbt:
+    pdf_caricato = False
+
     def __init__(self):
         self.chat_history = []
-        self.qa, self.vector_store = self.load_db("stuff", 4)
+        self.qa = self.load_db("stuff", 4)
+        self.pdf_caricato = True
+        self.vector_store = self.load_vector_store()
 
     def load_db(self, chain_type, k):
-        embeddings = OpenAIEmbeddings()
-        vector_store = Pinecone.from_existing_index('embedding-bandi', embeddings)
+        vector_store = self.load_vector_store()
         retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": k})
         qa = ConversationalRetrievalChain.from_llm(
             llm=ChatOpenAI(model_name='ft:gpt-3.5-turbo-1106:links:gpt-3-5-signorile:8S8SNEPI', temperature=0.5),
@@ -43,9 +46,21 @@ class chatbt:
             return_source_documents=True,
             return_generated_question=True,
         )
-        return qa, vector_store
+        return qa 
+
+    def load_vector_store(self):
+        embeddings = OpenAIEmbeddings()
+        directory = 'Documenti/docs/chroma/'
+        # Utilizza Chroma solo se il PDF non è stato caricato
+        if self.pdf_caricato == True:
+            vector_store = Chroma(persist_directory= directory,embedding_function = embeddings)
+        else:
+            vector_store = Pinecone.from_existing_index('embedding-bandi', embeddings)
+        return vector_store
+        
     
     def load_pdf(self, uploaded_file):
+        directory = 'Documenti/docs/chroma/'
         temp_dir = tempfile.mkdtemp()
         path = os.path.join(temp_dir, uploaded_file.name)
         with open(path, "wb") as f:
@@ -55,12 +70,12 @@ class chatbt:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
         docs = text_splitter.split_documents(pdf_text)
         embeddings = OpenAIEmbeddings()
-        vector_store = Chroma.from_documents(docs, embeddings)
+        vector_store = Chroma.from_documents(docs, embeddings, persist_directory= directory)
 
         chatbt_instance.vector_store = vector_store
         chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
-
-        return st.success("Documento PDF caricato con successo!"),vector_store
+        self.pdf_caricato = True
+        return st.success("Documento PDF caricato con successo!"),vector_store 
 
 # Streamlit code
 st.title('Chatbot Bandi in corso Regione Puglia')
@@ -72,7 +87,7 @@ if uploaded_file:
 
 # messaggio di benvenuto
 with st.chat_message('assistant'):
-     st.write("Ciao, sono il tuo assistente personlale personalizzato per rispondere a domande relative ai bandi in corso della regione Puglia!")
+     st.write("Ciao, sono il tuo assistente personale personalizzato per rispondere a domande relative ai bandi in corso della regione Puglia!")
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -89,7 +104,8 @@ if user_input := st.chat_input("Inserisci la tua domanda:"):
 
     result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history})
     chatbt_instance.chat_history.append([(user_input, result["answer"])])
-    chatbt_instance.qa, chatbt_instance.vector_store = chatbt_instance.load_db("stuff", 4)
+    chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
+    chatbt_instance.vector_store = chatbt_instance.load_vector_store()
     chatbt_instance.answer = result['answer']
      
     # Add user message to chat history
