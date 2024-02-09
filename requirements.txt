@@ -1,9 +1,12 @@
 python-dotenv
 langchain
+langchain_openai
+langchain_pinecone
+langchain_community
 openai
 chromadb
 tiktoken
 streamlit
 pinecone-client
-pysqlite3-binary
 pypdf
+pysqlite3-binary

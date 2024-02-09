@@ -1,13 +1,14 @@
 import streamlit as st
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma,Pinecone
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.chat_models import ChatOpenAI
+from langchain_pinecone import Pinecone as PineconeStore
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 import os
-import pinecone
+from pinecone import Pinecone
 import tempfile
 import time
 __import__('pysqlite3')
@@ -17,15 +18,11 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 load_dotenv('.env')
 
 # Inizializza Pinecone
-pinecone.init(
-    api_key=os.environ.get('PINECONE_API_KEY'),
-    environment=os.environ.get('PINECONE_ENV')
-)
+PINECONE_API_KEY = os.environ.get('PINECONE_API_KEY')
 
 # Imposta variabili di ambiente per LangChain
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
-os.environ["LANGCHAIN_API_KEY"] = "ls__0554eeed658141b4a601195abd6c737d"
 
 class chatbt:
     pdf_caricato = False
@@ -55,7 +52,8 @@ class chatbt:
         if self.pdf_caricato == True:
             vector_store = Chroma(persist_directory= directory,embedding_function = embeddings)
         else:
-            vector_store = Pinecone.from_existing_index('embedding-bandi', embeddings)
+            indexname='embedding-bandi'
+            vector_store = PineconeStore(index_name = indexname, embedding = embeddings)
         return vector_store
         
     
