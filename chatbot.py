@@ -50,8 +50,6 @@ class chatbt:
             retriever=retriever,
             memory = memory,
             verbose= False,
-            return_source_documents=True,
-            return_generated_question=True,
         )
         return qa 
 
@@ -86,7 +84,7 @@ class chatbt:
         return st.success("Documento PDF caricato con successo!"),vector_store 
 
 # Streamlit code
-st.title('Chatbot Bandi in corso Regione Puglia')
+st.title('Chatbot Bandi in corso Sistema Puglia')
 chatbt_instance = chatbt()
 
 uploaded_file = st.file_uploader("File upload", type="pdf")
@@ -95,7 +93,7 @@ if uploaded_file:
 
 # messaggio di benvenuto
 with st.chat_message('assistant'):
-     st.write("Ciao, sono il tuo assistente personale personalizzato per rispondere a domande relative ai bandi in corso della regione Puglia!")
+     st.write("Ciao, sono il tuo assistente personale personalizzato per rispondere a domande relative ai bandi in corso della regione Puglia presenti sul sito [link](https://www.sistema.puglia.it/)!")
 
 # Initialize chat history
 if "messages" not in st.session_state:
