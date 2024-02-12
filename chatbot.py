@@ -48,10 +48,10 @@ class chatbt:
                            model_kwargs= {"frequency_penalty": 0.5}),
             chain_type=chain_type,
             retriever=retriever,
-            memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3),
+            memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, output_key='answer'),
             verbose= False,
-            return_source_documents=False,
-            return_generated_question=False,
+            return_source_documents=True,
+            return_generated_question=True,
         )
         return qa 
 
@@ -110,7 +110,8 @@ if user_input := st.chat_input("Inserisci la tua domanda:"):
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    result = chatbt_instance.qa({"question": user_input})
+    result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history})
+    chatbt_instance.chat_history.append([(user_input, result["answer"])])
     chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
     chatbt_instance.vector_store = chatbt_instance.load_vector_store()
     chatbt_instance.answer = result['answer']
