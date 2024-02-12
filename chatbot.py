@@ -2,7 +2,8 @@ import streamlit as st
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain_openai import ChatOpenAI
 from langchain_pinecone import Pinecone as PineconeStore
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
@@ -23,6 +24,8 @@ PINECONE_API_KEY = os.environ.get('PINECONE_API_KEY')
 # Imposta variabili di ambiente per LangChain
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
+os.environ["LANGCHAIN_API_KEY"] = os.environ.get("LANGCHAIN_API_KEY")
+
 
 class chatbt:
     pdf_caricato = False
@@ -36,10 +39,17 @@ class chatbt:
     def load_db(self, chain_type, k):
         vector_store = self.load_vector_store()
         retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": k})
+        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
         qa = ConversationalRetrievalChain.from_llm(
-            llm=ChatOpenAI(model_name='ft:gpt-3.5-turbo-1106:links:gpt-3-5-signorile:8S8SNEPI', temperature=0.5),
+            llm=ChatOpenAI(model_name='ft:gpt-3.5-turbo-1106:links:gpt-3-5-signorile:8S8SNEPI', 
+                           temperature=0.6, 
+                           max_tokens=1024, 
+                           model_kwargs= {"frequency_penalty": 0.5}),
             chain_type=chain_type,
             retriever=retriever,
+            memory = memory,
+            verbose= False,
             return_source_documents=True,
             return_generated_question=True,
         )
