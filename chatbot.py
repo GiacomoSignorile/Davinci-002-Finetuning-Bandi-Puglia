@@ -50,6 +50,8 @@ class chatbt:
             retriever=retriever,
             memory = memory,
             verbose= False,
+            return_source_documents=True,
+            return_generated_question=True,
         )
         return qa 
 
@@ -108,7 +110,7 @@ if user_input := st.chat_input("Inserisci la tua domanda:"):
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history})
+    result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history["answer"]})
     chatbt_instance.chat_history.append([(user_input, result["answer"])])
     chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
     chatbt_instance.vector_store = chatbt_instance.load_vector_store()
