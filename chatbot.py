@@ -50,8 +50,8 @@ class chatbt:
             retriever=retriever,
             memory = memory,
             verbose= False,
-            return_source_documents=True,
-            return_generated_question=True,
+            return_source_documents=False,
+            return_generated_question=False,
         )
         return qa 
 
