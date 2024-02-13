@@ -32,6 +32,7 @@ class chatbt:
 
     def __init__(self):
         self.chat_history = []
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, input_key='answer')
         self.qa = self.load_db("stuff", 4)
         self.pdf_caricato = True
         self.vector_store = self.load_vector_store()
@@ -48,8 +49,8 @@ class chatbt:
                            model_kwargs= {"frequency_penalty": 0.5}),
             chain_type=chain_type,
             retriever=retriever,
-            memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, input_key='answer'),
-            verbose= False,
+            memory = self.memory,
+            verbose= True,
             return_source_documents=True,
             return_generated_question=True,
         )
@@ -111,6 +112,7 @@ if user_input := st.chat_input("Inserisci la tua domanda:"):
         st.markdown(user_input)
 
     result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history})
+    chatbt_instance.memory.save_context({"input": user_input}, {"output": result['answer']})
     chatbt_instance.chat_history.append([(user_input, result["answer"])])
     chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
     chatbt_instance.vector_store = chatbt_instance.load_vector_store()
