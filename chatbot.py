@@ -48,7 +48,7 @@ class chatbt:
                            model_kwargs= {"frequency_penalty": 0.5}),
             chain_type=chain_type,
             retriever=retriever,
-            memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, output_key='answer'),
+            memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, input_key='answer'),
             verbose= False,
             return_source_documents=True,
             return_generated_question=True,
