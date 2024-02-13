@@ -32,7 +32,7 @@ class chatbt:
 
     def __init__(self):
         self.chat_history = []
-        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, input_key='answer')
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, input_key='answer', output_key='answer')
         self.qa = self.load_db("stuff", 4)
         self.pdf_caricato = True
         self.vector_store = self.load_vector_store()
