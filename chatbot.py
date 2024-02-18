@@ -34,7 +34,7 @@ class chatbt:
 
     def __init__(self):
         self.chat_history = []
-        self.memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, llm=OpenAI(), max_token_limit=60)
+        self.memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, llm=OpenAI(), max_token_limit=1200)
         self.qa = self.load_db("stuff", 4)
         self.pdf_caricato = True
         self.vector_store = self.load_vector_store()
