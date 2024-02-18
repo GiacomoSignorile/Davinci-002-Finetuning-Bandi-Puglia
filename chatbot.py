@@ -1,12 +1,14 @@
+import shutil
 import streamlit as st
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory
+from langchain.memory import ConversationBufferMemory, ConversationTokenBufferMemory
 from langchain_openai import ChatOpenAI
 from langchain_pinecone import Pinecone as PineconeStore
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain_openai import OpenAI
 from dotenv import load_dotenv
 import os
 from pinecone import Pinecone
@@ -32,7 +34,7 @@ class chatbt:
 
     def __init__(self):
         self.chat_history = []
-        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3)
+        self.memory = ConversationTokenBufferMemory(memory_key="chat_history", return_messages=True, llm=OpenAI(), max_token_limit=60)
         self.qa = self.load_db("stuff", 4)
         self.pdf_caricato = True
         self.vector_store = self.load_vector_store()
@@ -68,6 +70,7 @@ class chatbt:
     
     def load_pdf(self, uploaded_file):
         directory = 'Documenti/docs/chroma/'
+        shutil.rmtree(temp_dir)
         temp_dir = tempfile.mkdtemp()
         path = os.path.join(temp_dir, uploaded_file.name)
         with open(path, "wb") as f:
@@ -82,6 +85,7 @@ class chatbt:
         chatbt_instance.vector_store = vector_store
         chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
         self.pdf_caricato = True
+        shutil.rmtree(temp_dir)
         return st.success("Documento PDF caricato con successo!"),vector_store 
 
 # Streamlit code
