@@ -70,7 +70,6 @@ class chatbt:
     
     def load_pdf(self, uploaded_file):
         directory = 'Documenti/docs/chroma/'
-        shutil.rmtree(temp_dir)
         temp_dir = tempfile.mkdtemp()
         path = os.path.join(temp_dir, uploaded_file.name)
         with open(path, "wb") as f:
