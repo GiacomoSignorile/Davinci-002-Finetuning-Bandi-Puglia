@@ -32,7 +32,7 @@ class chatbt:
 
     def __init__(self):
         self.chat_history = []
-        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3, output_key='answer')
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k = 3)
         self.qa = self.load_db("stuff", 4)
         self.pdf_caricato = True
         self.vector_store = self.load_vector_store()
@@ -50,9 +50,7 @@ class chatbt:
             chain_type=chain_type,
             retriever=retriever,
             memory = self.memory,
-            verbose= True,
-            return_source_documents=True,
-            return_generated_question=True,
+            verbose= True
         )
         return qa 
 
