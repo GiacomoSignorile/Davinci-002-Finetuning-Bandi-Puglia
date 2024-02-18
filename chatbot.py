@@ -84,7 +84,6 @@ class chatbt:
         chatbt_instance.vector_store = vector_store
         chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
         self.pdf_caricato = True
-        shutil.rmtree(temp_dir)
         return st.success("Documento PDF caricato con successo!"),vector_store 
 
 # Streamlit code
