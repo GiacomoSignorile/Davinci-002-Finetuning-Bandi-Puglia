@@ -110,7 +110,6 @@ if user_input := st.chat_input("Inserisci la tua domanda:"):
         st.markdown(user_input)
 
     result = chatbt_instance.qa({"question": user_input, "chat_history": chatbt_instance.chat_history})
-    chatbt_instance.memory.save_context({"input": user_input}, {"output": result['answer']})
     chatbt_instance.chat_history.append([(user_input, result["answer"])])
     chatbt_instance.qa = chatbt_instance.load_db("stuff", 4)
     chatbt_instance.vector_store = chatbt_instance.load_vector_store()
@@ -132,5 +131,6 @@ if user_input := st.chat_input("Inserisci la tua domanda:"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     # Add assistant response to chat history
+    chatbt_instance.memory.save_context({"input": user_input}, {"output": full_response})
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
